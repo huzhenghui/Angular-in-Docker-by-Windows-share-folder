@@ -1,0 +1,66 @@
+version: "3.4"
+services:
+  node-npm-9.10.0-5.8.0:
+    image: node-npm:9.10.0-5.8.0
+    build:
+      context: .
+      dockerfile: node-npm-9.10.0-5.8.0.Dockerfile
+  angular.cli-1.7.3:
+    depends_on:
+      - node-npm-9.10.0-5.8.0
+    image: angular.cli:1.7.3
+    build:
+      context: .
+      dockerfile: angular.cli-1.7.3.Dockerfile
+  ng-new:
+    depends_on:
+      - angular.cli-1.7.3
+    image: angular.cli:1.7.3
+    volumes:
+      - type: volume
+        source: ApplicationRootVolume
+        target: /ApplicationRoot
+      - type: volume
+        source: AngularAppNodeModules
+        target: /ApplicationRoot/Angular-App/node_modules
+    command: |
+      bash -c '
+      cd /ApplicationRoot;
+      ng new Angular-App;'
+  npm-install:
+    depends_on:
+      - ng-new
+    image: angular.cli:1.7.3
+    volumes:
+      - type: volume
+        source: ApplicationRootVolume
+        target: /ApplicationRoot
+      - type: volume
+        source: AngularAppNodeModules
+        target: /ApplicationRoot/Angular-App/node_modules
+    command: |
+      bash -c '
+      cd /ApplicationRoot/Angular-App;
+      npm install;'
+  ng-serve:
+    depends_on:
+      - npm-install
+    image: angular.cli:1.7.3
+    volumes:
+      - type: volume
+        source: ApplicationRootVolume
+        target: /ApplicationRoot
+      - type: volume
+        source: AngularAppNodeModules
+        target: /ApplicationRoot/Angular-App/node_modules
+    ports:
+      - 80:80
+    command: |
+      bash -c '
+      cd /ApplicationRoot/Angular-App;
+      ng serve --verbose --progress --host 0.0.0.0 --port 80 --poll 1;'
+volumes:
+  ApplicationRootVolume:
+    external:
+      name: Angular-in-Docker-by-Windows-share-folder
+  AngularAppNodeModules:
