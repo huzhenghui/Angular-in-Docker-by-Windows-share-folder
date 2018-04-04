@@ -23,10 +23,15 @@ services:
       - type: volume
         source: AngularAppNodeModules
         target: /ApplicationRoot/Angular-App/node_modules
+      - Docker-Compose-Startup-Order:/Startup-Order
     command: |
       bash -c '
+      echo ng-new start;
+      touch /Startup-Order/ng-new.start;
       cd /ApplicationRoot;
-      ng new Angular-App;'
+      ng new Angular-App;
+      echo ng-new done return code = $$?;
+      touch /Startup-Order/ng-new.done;'
   npm-install:
     depends_on:
       - ng-new
@@ -38,10 +43,17 @@ services:
       - type: volume
         source: AngularAppNodeModules
         target: /ApplicationRoot/Angular-App/node_modules
+      - Docker-Compose-Startup-Order:/Startup-Order
     command: |
       bash -c '
+      echo npm-install start;
+      touch /Startup-Order/npm-install.start;
+      while [[ ! -f /Startup-Order/ng-new.done || /Startup-Order/ng-new.done -ot /Startup-Order/ng-new.start ]]; do sleep 1; done;
+      echo npm-install doing;
       cd /ApplicationRoot/Angular-App;
-      npm install;'
+      npm install;
+      echo npm-install done;
+      touch /Startup-Order/npm-install.done;'
   ng-serve:
     depends_on:
       - npm-install
@@ -53,10 +65,14 @@ services:
       - type: volume
         source: AngularAppNodeModules
         target: /ApplicationRoot/Angular-App/node_modules
+      - Docker-Compose-Startup-Order:/Startup-Order
     ports:
       - 80:80
     command: |
       bash -c '
+      echo ng-serve start;
+      while [[ ! -f /Startup-Order/npm-install.done || /Startup-Order/npm-install.done -ot /Startup-Order/npm-install.start ]]; do sleep 1; done;
+      echo ng-serve doing;
       cd /ApplicationRoot/Angular-App;
       ng serve --verbose --progress --host 0.0.0.0 --port 80 --poll 1;'
 volumes:
@@ -64,3 +80,4 @@ volumes:
     external:
       name: Angular-in-Docker-by-Windows-share-folder
   AngularAppNodeModules:
+  Docker-Compose-Startup-Order:

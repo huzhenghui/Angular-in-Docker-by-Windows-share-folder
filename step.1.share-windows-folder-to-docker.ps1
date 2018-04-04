@@ -1,0 +1,1 @@
+.\share-windows-folder-to-docker\share-windows-folder-to-docker.ps1 -volumeName Angular-in-Docker-by-Windows-share-folder -optCache none
