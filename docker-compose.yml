@@ -20,9 +20,7 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - type: volume
-        source: AngularAppNodeModules
-        target: /ApplicationRoot/Angular-App/node_modules
+      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
       - Docker-Compose-Startup-Order:/Startup-Order
     command: |
       bash -c '
@@ -40,9 +38,7 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - type: volume
-        source: AngularAppNodeModules
-        target: /ApplicationRoot/Angular-App/node_modules
+      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
       - Docker-Compose-Startup-Order:/Startup-Order
     command: |
       bash -c '
@@ -62,9 +58,7 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - type: volume
-        source: AngularAppNodeModules
-        target: /ApplicationRoot/Angular-App/node_modules
+      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
       - Docker-Compose-Startup-Order:/Startup-Order
     ports:
       - 80:80
@@ -77,7 +71,9 @@ services:
       ng serve --verbose --progress --host 0.0.0.0 --port 80 --poll 1;'
 volumes:
   ApplicationRootVolume:
-    external:
-      name: Angular-in-Docker-by-Windows-share-folder
+    external: true
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_VOLUMENAME}
   AngularAppNodeModules:
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_FILTER_NAME}_node_modules_${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_HASH}
   Docker-Compose-Startup-Order:
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_FILTER_NAME}_startup_order_${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_HASH}

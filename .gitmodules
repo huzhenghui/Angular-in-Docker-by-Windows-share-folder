@@ -1,3 +1,6 @@
 [submodule "share-windows-folder-to-docker"]
 	path = share-windows-folder-to-docker
 	url = https://github.com/huzhenghui/share-windows-folder-to-docker.git
+[submodule "Angular-App"]
+	path = Angular-App
+	url = https://github.com/primefaces/primeng-quickstart-cli.git
