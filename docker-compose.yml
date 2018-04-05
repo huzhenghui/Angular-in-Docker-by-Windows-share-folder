@@ -68,7 +68,7 @@ services:
       while [[ ! -f /Startup-Order/npm-install.done || /Startup-Order/npm-install.done -ot /Startup-Order/npm-install.start ]]; do sleep 1; done;
       echo ng-serve doing;
       cd /ApplicationRoot/Angular-App;
-      ng serve --verbose --progress --host 0.0.0.0 --disable-host-check --port 80 --poll 1;'
+      ng serve --verbose --progress --host 0.0.0.0 --disable-host-check --public-host ${NG_SERVE_PUBLIC_HOST} --port 80 --poll 1;'
 volumes:
   ApplicationRootVolume:
     external: true

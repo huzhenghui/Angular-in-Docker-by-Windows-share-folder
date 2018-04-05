@@ -10,4 +10,12 @@ else
 {
     $env:ANGULAR_IN_DOCKER_NODE_MODULES_TARGET = "/ApplicationRoot/Angular-App/node_modules"
 }
+if ($env:DOCKER_HOST -match "\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")
+{
+    $env:NG_SERVE_PUBLIC_HOST = $Matches[0];
+}
+else
+{
+    $env:NG_SERVE_PUBLIC_HOST = '127.0.0.1';
+}
 docker-compose up
