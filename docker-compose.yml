@@ -20,8 +20,12 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
-      - Docker-Compose-Startup-Order:/Startup-Order
+      - type: volume
+        source: AngularAppNodeModules
+        target: ${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
+      - type: volume
+        source: Docker-Compose-Startup-Order
+        target: /Startup-Order
     command: |
       bash -c '
       echo ng-new start;
@@ -38,8 +42,12 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
-      - Docker-Compose-Startup-Order:/Startup-Order
+      - type: volume
+        source: AngularAppNodeModules
+        target: ${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
+      - type: volume
+        source: Docker-Compose-Startup-Order
+        target: /Startup-Order
     command: |
       bash -c '
       echo npm-install start;
@@ -48,6 +56,7 @@ services:
       echo npm-install doing;
       cd /ApplicationRoot/Angular-App;
       npm install;
+      npm install @angular/cli@1.7.3;
       echo npm-install done;
       touch /Startup-Order/npm-install.done;'
   ng-serve:
@@ -58,8 +67,14 @@ services:
       - type: volume
         source: ApplicationRootVolume
         target: /ApplicationRoot
-      - AngularAppNodeModules:${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
-      - Docker-Compose-Startup-Order:/Startup-Order
+        read_only: true
+      - type: volume
+        source: AngularAppNodeModules
+        target: ${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
+        read_only: true
+      - type: volume
+        source: Docker-Compose-Startup-Order
+        target: /Startup-Order
     ports:
       - 80:80
     command: |
@@ -68,7 +83,7 @@ services:
       while [[ ! -f /Startup-Order/npm-install.done || /Startup-Order/npm-install.done -ot /Startup-Order/npm-install.start ]]; do sleep 1; done;
       echo ng-serve doing;
       cd /ApplicationRoot/Angular-App;
-      ng serve --verbose --progress --host 0.0.0.0 --disable-host-check --public-host ${NG_SERVE_PUBLIC_HOST} --port 80 --poll 1;'
+      ng serve --verbose --progress --sourcemaps --host 0.0.0.0 --disable-host-check --public-host ${NG_SERVE_PUBLIC_HOST} --port 80 --poll 1;'
 volumes:
   ApplicationRootVolume:
     external: true

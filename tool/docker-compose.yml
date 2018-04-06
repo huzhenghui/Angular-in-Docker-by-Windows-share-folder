@@ -1,0 +1,65 @@
+version: "3.4"
+services:
+  node-npm-9.10.0-5.8.0:
+    image: node-npm:9.10.0-5.8.0
+    build:
+      context: .
+      dockerfile: ../node-npm-9.10.0-5.8.0.Dockerfile
+  angular.cli-1.7.3:
+    depends_on:
+      - node-npm-9.10.0-5.8.0
+    image: angular.cli:1.7.3
+    build:
+      context: .
+      dockerfile: ../angular.cli-1.7.3.Dockerfile
+  angular-in-docker-by-windows-share-folder-tool:
+    depends_on:
+      - angular.cli-1.7.3
+    image: angular-in-docker-by-windows-share-folder:tool
+    build:
+      context: .
+      dockerfile: Dockerfile
+  tool-bash:
+    depends_on:
+      - angular-in-docker-by-windows-share-folder-tool
+    image: angular-in-docker-by-windows-share-folder:tool
+    volumes:
+      - type: volume
+        source: ApplicationRootVolume
+        target: /ApplicationRoot
+      - type: volume
+        source: AngularAppNodeModules
+        target: ${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
+      - type: volume
+        source: Docker-Compose-Startup-Order
+        target: /Startup-Order
+    command: bash
+  tool-rsync-node-modules:
+    depends_on:
+      - angular-in-docker-by-windows-share-folder-tool
+    image: angular-in-docker-by-windows-share-folder:tool
+    volumes:
+      - type: volume
+        source: ApplicationRootVolume
+        target: /ApplicationRoot
+      - type: volume
+        source: AngularAppNodeModules
+        target: ${ANGULAR_IN_DOCKER_NODE_MODULES_TARGET}
+        read_only: true
+    command: |
+      rsync
+      --verbose
+      --checksum
+      --recursive
+      --times
+      --delete
+      /internal-node_modules
+      /ApplicationRoot/Angular-App/node_modules
+volumes:
+  ApplicationRootVolume:
+    external: true
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_VOLUMENAME}
+  AngularAppNodeModules:
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_FILTER_NAME}_node_modules_${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_HASH}
+  Docker-Compose-Startup-Order:
+    name: ${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_FILTER_NAME}_startup_order_${SHARE_WINDOWS_FOLDER_TO_DOCKER_DIRECTORY_HASH}

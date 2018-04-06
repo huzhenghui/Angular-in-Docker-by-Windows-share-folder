@@ -4,7 +4,7 @@ Param(
 Get-Content .\share-windows-folder-to-docker.env | Invoke-Expression
 if($localNodeModules.IsPresent)
 {
-    $env:ANGULAR_IN_DOCKER_NODE_MODULES_TARGET = "/fake"
+    $env:ANGULAR_IN_DOCKER_NODE_MODULES_TARGET = "/internal-node_modules"
 }
 else
 {
